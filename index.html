@@ -332,11 +332,6 @@
       margin: 0 5px;
       cursor: pointer;
     }
-
-
-  <!-- Bibliothèques JS -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://d3js.org/d3-geo.v3.min.js"></script>
   </style>
 </head>
 <body>
@@ -455,7 +450,10 @@
       </div>
     </div>
   </div>
-  
+
+  <!-- Bibliothèques JS -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/d3-geo.v3.min.js"></script>
 
   <script>
     // Variables globales
@@ -870,34 +868,7 @@
         renderByCountry();
       }
     }
-  <script>
-    // Variables globales
-    const byCountryList = document.getElementById('byCountryList');
-    const totalValueDisplay = document.getElementById('totalValueDisplay');
-    const form = document.getElementById('moneyForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const cancelEditBtn = document.getElementById('cancelEdit');
-    const editIndexInput = document.getElementById('editIndex');
-    const countryInput = document.getElementById('countryInput');
-    const selectedCountriesContainer = document.getElementById('selectedCountries');
-    const searchInput = document.getElementById('searchCountry');
-    const toggleCompactBtn = document.getElementById('toggleCompactCountry');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const authModal = document.getElementById('authModal');
-    const closeModal = document.querySelector('.close');
-    
-    // Configuration GitHub
-    const GITHUB_USERNAME = 'Picolaton-vld'; // À remplacer
-    const GITHUB_REPO = 'Collection-monnaie'; // À remplacer
-    const GITHUB_TOKEN = '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'; // À remplacer (token avec accès repo)
-    
-    let collection = [];
-    let editingIndex = -1;
-    let selectedCountries = [];
-    let isCompactView = false;
-    let currentSearchTerm = '';
-    let currentUser = null;
+
     // Gestion de l'authentification
     loginBtn.addEventListener('click', () => {
       authModal.style.display = 'block';
@@ -1003,31 +974,12 @@
         saveAndRender();
       }
     }
-<div id="authModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Connexion / Inscription</h2>
-    <div id="authTabs">
-      <button class="auth-tab active" onclick="openAuthTab('login')">Connexion</button>
-      <button class="auth-tab" onclick="openAuthTab('register')">Inscription</button>
-    </div>
 
-    <div id="loginForm" class="auth-form">
-      <input type="text" id="loginUsername" placeholder="Nom d'utilisateur" required>
-      <input type="password" id="loginPassword" placeholder="Mot de passe" required>
-      <button onclick="loginUser()">Se connecter</button>
-      <p id="loginError" class="error-message"></p>
-    </div>
-
-    <div id="registerForm" class="auth-form" style="display:none;">
-      <input type="text" id="registerUsername" placeholder="Nom d'utilisateur" required>
-      <input type="password" id="registerPassword" placeholder="Mot de passe" required>
-      <input type="password" id="registerConfirmPassword" placeholder="Confirmer le mot de passe" required>
-      <button onclick="registerUser()">S'inscrire</button>
-      <p id="registerError" class="error-message"></p>
-    </div>
-  </div>
-</div>
+    // Initialisation
+    updateAuthUI();
+    if (currentUser) {
+      loadUserCollection(currentUser);
+    }
   </script>
 </body>
 </html>
