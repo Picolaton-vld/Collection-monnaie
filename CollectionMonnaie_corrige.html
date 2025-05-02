@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma Collection de Monnaie</title>
+  <style>
+    /* Barre de navigation */
+    .navbar {
+      background-color: #004d40;
+      padding: 10px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .nav-item {
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      margin: 0 5px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .nav-item:hover {
+      background-color: #00695c;
+    }
+    .nav-item.active {
+      background-color: #00796b;
+      font-weight: bold;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f2f2f2 0%, #e0f7fa 100%);
+      background-attachment: fixed;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #004d40;
+      margin-top: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+      background-color: #ffffffcc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    #mapContainer {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+    #worldMap {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 2px solid #004d40;
+      border-radius: 10px;
+      background-color: #f8f8f8;
+    }
+    .country {
+      fill: #dddddd;
+      stroke: #ffffff;
+      stroke-width: 0.5;
+      transition: fill 0.3s;
+    }
+    .country-highlight {
+      fill: #4CAF50;
+      fill-opacity: 0.7;
+      stroke: #004d40;
+      stroke-width: 0.5;
+    }
+    .country:hover {
+      fill-opacity: 0.9;
+    }
+    .item {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      background-color: #ffffffcc;
+      border-radius: 8px;
+      padding: 10px;
+      position: relative;
+    }
+    .item.compact {
+      padding: 8px;
+    }
+    .item.compact .details {
+      display: none;
+    }
+    img {
+      max-height: 100px;
+      display: block;
+      margin-top: 5px;
+    }
+    .delete-btn, .edit-btn, .toggle-btn {
+      cursor: pointer;
+      margin-top: 5px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .delete-btn {
+      color: red;
+    }
+    .edit-btn {
+      color: #00695c;
+    }
+    .toggle-btn {
+      color: #004d40;
+    }
+    #totalValueDisplay {
+      font-weight: bold;
+      margin-top: 20px;
+      font-size: 1.2em;
+      text-align: center;
+      color: #00695c;
+    }
+    section {
+      margin-bottom: 40px;
+    }
+    #piecesList, #billetsList, #byCountryList {
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+    #cancelEdit {
+      background-color: #f44336;
+    }
+    .country-tag {
+      display: inline-block;
+      background: #e0f7fa;
+      padding: 2px 8px;
+      margin: 2px;
+      border-radius: 10px;
+      border: 1px solid #004d40;
+      font-size: 0.9em;
+    }
+    .country-tag .remove {
+      cursor: pointer;
+      margin-left: 5px;
+      color: #d32f2f;
+    }
+    #countryTags {
+      margin-top: 5px;
+    }
+    #countryInput {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .quick-add-countries {
+      margin: 5px 0;
+    }
+    .quick-add-btn {
+      background: #b2dfdb;
+      border: none;
+      padding: 3px 8px;
+      margin: 2px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8em;
+    }
+    .quick-add-btn:hover {
+      background: #80cbc4;
+    }
+    .country-folder {
+      margin-bottom: 20px;
+      border: 1px solid #004d40;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .country-folder-header {
+      background-color: #004d40;
+      color: white;
+      padding: 8px 15px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .country-folder-header:hover {
+      background-color: #00695c;
+    }
+    .country-folder-content {
+      padding: 10px;
+      background-color: #ffffffcc;
+    }
+    .folder-count {
+      background-color: white;
+      color: #004d40;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 0.8em;
+    }
+    .search-container {
+      max-width: 700px;
+      margin: 0 auto 20px;
+    }
+    #searchInput, #searchCountry {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #004d40;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    .compact-toggle {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    #toggleCompact {
+      background: #004d40;
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .total-item {
+      background-color: #ffffffcc;
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 8px;
+      max-width: 500px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#accueil" class="nav-item active" id="navAccueil">Accueil</a>
+      <a href="#pays" class="nav-item" id="navPays">Pays</a>
+      <a href="#carte" class="nav-item" id="navCarte">Carte du Monde</a>
+      <a href="#totaux" class="nav-item" id="navTotaux">Totaux</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Section Accueil (Ajout) -->
+    <section id="accueil">
+      <h1>Ma Collection de Monnaie</h1>
+      <h2>Ajouter ou modifier une pièce ou un billet</h2>
+      <form id="moneyForm">
+        <input type="hidden" id="editIndex" value="-1">
+        <label>Type :
+          <select id="type">
+            <option value="piece">Pièce</option>
+            <option value="billet">Billet</option>
+          </select>
+        </label>
+        
+        <label>Pays :
+          <div id="selectedCountries"></div>
+          <input type="text" id="countryInput" placeholder="Ajouter un pays...">
+          <div class="quick-add-countries">
+            <small>Ajout rapide : </small>
+            <button type="button" class="quick-add-btn" onclick="addCommonCountry('France')">France</button>
+            <button type="button" class="quick-add-btn" onclick="addCommonCountry('Suisse')">Suisse</button>
+            <button type="button" class="quick-add-btn" onclick="addCFACountries()">Franc CFA</button>
+          </div>
+        </label>
+        
+        <label>Nom / Description : <input type="text" id="description" /></label>
+        <label>Année : <input type="number" id="year" /></label>
+        <label>Quantité : <input type="number" id="quantity" min="1" value="1" /></label>
+        <label>Valeur faciale : <input type="number" id="faceValue" step="any" /></label>
+        <label>Devise : 
+          <input type="text" id="currency" placeholder="ex : Franc, Peseta, Mark..." />
+          <button type="button" id="fetchRate">🔄 Obtenir le taux</button>
+        </label>
+        <label>Taux de conversion en € : <input type="number" id="conversionRate" step="any" placeholder="ex : 0.0000098" /></label>
+        <label>Encore en circulation : 
+          <select id="validity">
+            <option value="valide">Encore valable</option>
+            <option value="demonetise">Démonétisé</option>
+          </select>
+        </label>
+        <label>URL de l'image (Numista) : <input type="url" id="image" placeholder="https://fr.numista.com/catalogue/..." /></label>
+        <label>Rareté (d'après Numista) : <input type="text" id="rarity" placeholder="Très courant, Peu commun, Rare..." /></label>
+        <div class="form-buttons">
+          <button type="submit" id="submitBtn">Ajouter</button>
+          <button type="button" id="cancelEdit" style="display:none;">Annuler</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Section Pays -->
+    <section id="pays" style="display:none;">
+      <h2>Collection par Pays</h2>
+      <div class="search-container">
+        <input type="text" id="searchCountry" placeholder="Rechercher un pays...">
+      </div>
+      <div class="compact-toggle">
+        <button id="toggleCompactCountry">Basculer en mode compact</button>
+      </div>
+      <div id="byCountryList"></div>
+    </section>
+
+    <!-- Section Carte -->
+    <section id="carte" style="display:none;">
+      <h2>Carte du Monde</h2>
+      <div id="mapContainer">
+        <svg id="worldMap" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </section>
+
+    <!-- Section Totaux -->
+    <section id="totaux" style="display:none;">
+      <h2>Valeur Totale de la Collection</h2>
+      <div id="totalValueDisplay"></div>
+    </section>
+  </div>
+
+  <!-- Ajout des bibliothèques D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/d3-geo.v3.min.js"></script>
+
+  <script>
+    // Variables globales
+    const byCountryList = document.getElementById('byCountryList');
+    const totalValueDisplay = document.getElementById('totalValueDisplay');
+    const form = document.getElementById('moneyForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelEditBtn = document.getElementById('cancelEdit');
+    const editIndexInput = document.getElementById('editIndex');
+    const countryInput = document.getElementById('countryInput');
+    const selectedCountriesContainer = document.getElementById('selectedCountries');
+    const searchInput = document.getElementById('searchCountry');
+    const toggleCompactBtn = document.getElementById('toggleCompactCountry');
+    const storageKey = 'maCollectionMonnaie';
+
+    let collection = JSON.parse(localStorage.getItem(storageKey)) || [];
+    let editingIndex = -1;
+    let selectedCountries = [];
+    let isCompactView = false;
+    let currentSearchTerm = '';
+
+    // Gestion de la navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Désactiver tous les onglets
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.querySelectorAll('section[id]').forEach(section => section.style.display = 'none');
+        
+        // Activer l'onglet courant
+        this.classList.add('active');
+        const target = this.getAttribute('href').substring(1);
+        document.getElementById(target).style.display = 'block';
+        
+        // Mettre à jour les contenus si nécessaire
+        switch(target) {
+          case 'pays':
+            renderByCountry();
+            break;
+          case 'carte':
+            updateMap();
+            break;
+          case 'totaux':
+            updateTotals();
+            break;
+        }
+      });
+    });
+
+    // Gestion des tags de pays
+    countryInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && this.value.trim()) {
+        addCountry(this.value.trim());
+        this.value = '';
+        e.preventDefault();
+      }
+    });
+
+    function addCountry(country) {
+      if (country && !selectedCountries.includes(country)) {
+        selectedCountries.push(country);
+        renderCountryTags();
+      }
+    }
+
+    function removeCountry(country) {
+      const index = selectedCountries.indexOf(country);
+      if (index > -1) {
+        selectedCountries.splice(index, 1);
+        renderCountryTags();
+      }
+    }
+
+    function renderCountryTags() {
+      selectedCountriesContainer.innerHTML = selectedCountries.map(country => `
+        <span class="country-tag">
+          ${country}
+          <span class="remove" onclick="removeCountry('${country.replace(/'/g, "\\'")}')">×</span>
+        </span>
+      `).join('');
+    }
+
+    // Fonctions pour ajout rapide
+    window.addCommonCountry = function(country) {
+      addCountry(country);
+    };
+
+    window.addCFACountries = function() {
+      const cfaCountries = ["Bénin", "Burkina Faso", "Côte d'Ivoire", "Guinée-Bissau", 
+                           "Mali", "Niger", "Sénégal", "Togo", "Cameroun", 
+                           "Centrafrique", "Comores", "Congo", "Gabon", "Guinée équatoriale", 
+                           "Tchad"];
+      cfaCountries.forEach(country => {
+        if (!selectedCountries.includes(country)) {
+          selectedCountries.push(country);
+        }
+      });
+      renderCountryTags();
+    };
+
+    // Gestion du mode compact
+    toggleCompactBtn.addEventListener('click', function() {
+      isCompactView = !isCompactView;
+      this.textContent = isCompactView ? 'Basculer en mode détaillé' : 'Basculer en mode compact';
+      renderByCountry();
+    });
+
+    // Gestion de la recherche
+    searchInput.addEventListener('input', function() {
+      currentSearchTerm = this.value.toLowerCase();
+      renderByCountry();
+    });
+
+    // Fonction pour afficher les totaux
+    function updateTotals() {
+      let total = 0;
+      let totalValide = 0;
+      let totalDemonetise = 0;
+
+      collection.forEach(item => {
+        const valueInEuro = (item.faceValue || 0) * (item.conversionRate || 0);
+        const itemTotal = valueInEuro * (item.quantity || 1);
+        total += itemTotal;
+        if (item.validity === 'valide') {
+          totalValide += itemTotal;
+        } else {
+          totalDemonetise += itemTotal;
+        }
+      });
+
+      totalValueDisplay.innerHTML = `
+        <div class="total-item">
+          <strong>Total global :</strong> ${total.toFixed(2)} €
+        </div>
+        <div class="total-item">
+          <strong>Monnaies valides :</strong> ${totalValide.toFixed(2)} €
+        </div>
+        <div class="total-item">
+          <strong>Démonétisées :</strong> ${totalDemonetise.toFixed(2)} €
+        </div>
+      `;
+    }
+
+    // Fonction pour mettre à jour la carte avec D3.js
+    function updateMap() {
+      const collectedCountries = new Set(
+        collection.flatMap(item => item.countries || [])
+          .map(country => country.toLowerCase())
+      );
+
+      const width = 1000;
+      const height = 500;
+
+      const svg = d3.select("#worldMap");
+      svg.selectAll("*").remove();
+
+      const projection = d3.geoMercator()
+        .scale(150)
+        .translate([width / 2, height / 2]);
+
+      const path = d3.geoPath().projection(projection);
+
+      d3.json("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json")
+        .then(function(world) {
+          svg.selectAll("path")
+            .data(world.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .attr("class", function(d) {
+              const countryName = d.properties.name.toLowerCase();
+              return collectedCountries.has(countryName) 
+                ? "country country-highlight" 
+                : "country";
+            })
+            .append("title")
+            .text(function(d) { return d.properties.name; });
+        })
+        .catch(function(error) {
+          console.error("Erreur de chargement de la carte:", error);
+          alert("Impossible de charger la carte du monde");
+        });
+    }
+
+    // Fonction pour afficher la collection par pays
+    function renderByCountry() {
+      byCountryList.innerHTML = '';
+      
+      // Créer un objet pour regrouper les items par pays
+      const itemsByCountry = {};
+      
+      const filteredCollection = currentSearchTerm 
+        ? collection.filter(item => {
+            const searchFields = [
+              item.description || '',
+              item.year || '',
+              item.currency || '',
+              item.countries ? item.countries.join(' ') : ''
+            ].join(' ').toLowerCase();
+            return searchFields.includes(currentSearchTerm);
+          })
+        : collection;
+      
+      filteredCollection.forEach(item => {
+        const countries = item.countries || ['Aucun pays'];
+        countries.forEach(country => {
+          if (!itemsByCountry[country]) {
+            itemsByCountry[country] = [];
+          }
+          itemsByCountry[country].push(item);
+        });
+      });
+      
+      // Trier les pays par ordre alphabétique
+      const sortedCountries = Object.keys(itemsByCountry).sort((a, b) => a.localeCompare(b));
+      
+      // Créer les dossiers par pays
+      sortedCountries.forEach(country => {
+        const countryItems = itemsByCountry[country];
+        const countryFolder = document.createElement('div');
+        countryFolder.className = 'country-folder';
+        
+        const folderHeader = document.createElement('div');
+        folderHeader.className = 'country-folder-header';
+        folderHeader.innerHTML = `
+          ${country} <span class="folder-count">${countryItems.length} ${countryItems.length > 1 ? 'items' : 'item'}</span>
+        `;
+        
+        const folderContent = document.createElement('div');
+        folderContent.className = 'country-folder-content';
+        
+        // Ajouter les items dans le dossier
+        countryItems.forEach((item, index) => {
+          const realIndex = collection.findIndex(colItem => 
+            JSON.stringify(colItem) === JSON.stringify(item)
+          );
+          
+          const valueInEuro = (item.faceValue || 0) * (item.conversionRate || 0);
+          const itemTotal = valueInEuro * (item.quantity || 1);
+          
+          const itemDiv = document.createElement('div');
+          itemDiv.className = `item ${isCompactView ? 'compact' : ''}`;
+          itemDiv.innerHTML = `
+            <strong>${item.description || 'Sans nom'}</strong> 
+            (${item.type === 'piece' ? 'Pièce' : 'Billet'}${item.year ? ', ' + item.year : ''})<br>
+            Quantité : ${item.quantity || 1}<br>
+            Valeur faciale : ${item.faceValue || 'N/A'} ${item.currency || ''}
+            <div class="details">
+              <br>Conversion : ${item.conversionRate ? (item.conversionRate * 1).toFixed(8) : 'N/A'} €<br>
+              Valeur totale estimée : ${itemTotal.toFixed(8)} €<br>
+              Rareté : ${item.rarity || 'Non indiquée'}<br>
+              Statut : ${item.validity === 'valide' ? 'Encore valable' : 'Démonétisé'}
+              ${item.image ? `<br><img src="${item.image}" alt="${item.description}" />` : ''}
+            </div>
+            <span class="toggle-btn" onclick="toggleDetails(this)">${isCompactView ? '▶ Afficher plus' : '▼ Afficher moins'}</span>
+            <span class="edit-btn" onclick="editItem(${realIndex})">✏️ Modifier</span>
+            <span class="delete-btn" onclick="deleteItem(${realIndex})">🗑️ Supprimer</span>
+          `;
+          folderContent.appendChild(itemDiv);
+        });
+        
+        // Gestion de l'ouverture/fermeture des dossiers
+        folderHeader.addEventListener('click', () => {
+          if (folderContent.style.display === 'none') {
+            folderContent.style.display = 'block';
+          } else {
+            folderContent.style.display = 'none';
+          }
+        });
+        
+        countryFolder.appendChild(folderHeader);
+        countryFolder.appendChild(folderContent);
+        byCountryList.appendChild(countryFolder);
+      });
+    }
+
+    window.toggleDetails = function(button) {
+      const item = button.closest('.item');
+      const details = item.querySelector('.details');
+      
+      if (details.style.display === 'none' || !details.style.display) {
+        details.style.display = 'block';
+        button.textContent = '▼ Afficher moins';
+      } else {
+        details.style.display = 'none';
+        button.textContent = '▶ Afficher plus';
+      }
+    };
+
+    window.editItem = function(index) {
+      editingIndex = index;
+      editIndexInput.value = index;
+      const item = collection[index];
+      populateForm(item);
+      submitBtn.textContent = 'Modifier';
+      cancelEditBtn.style.display = 'inline-block';
+      // Basculer vers l'onglet Accueil pour la modification
+      document.querySelector('.nav-item.active').classList.remove('active');
+      document.getElementById('navAccueil').classList.add('active');
+      document.querySelectorAll('section[id]').forEach(section => section.style.display = 'none');
+      document.getElementById('accueil').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteItem = function(index) {
+      if (confirm('Supprimer cet objet ?')) {
+        collection.splice(index, 1);
+        saveAndRender();
+      }
+    };
+
+    function populateForm(item) {
+      document.getElementById('type').value = item.type || 'piece';
+      selectedCountries = item.countries || [];
+      renderCountryTags();
+      document.getElementById('description').value = item.description || '';
+      document.getElementById('year').value = item.year || '';
+      document.getElementById('quantity').value = item.quantity || 1;
+      document.getElementById('faceValue').value = item.faceValue || '';
+      document.getElementById('currency').value = item.currency || '';
+      document.getElementById('conversionRate').value = item.conversionRate || '';
+      document.getElementById('validity').value = item.validity || 'valide';
+      document.getElementById('image').value = item.image || '';
+      document.getElementById('rarity').value = item.rarity || '';
+    }
+
+    cancelEditBtn.addEventListener('click', () => {
+      editingIndex = -1;
+      editIndexInput.value = -1;
+      form.reset();
+      selectedCountries = [];
+      renderCountryTags();
+      submitBtn.textContent = 'Ajouter';
+      cancelEditBtn.style.display = 'none';
+    });
+
+    document.getElementById('fetchRate').addEventListener('click', () => {
+      const currencyInput = document.getElementById('currency');
+      const rateInput = document.getElementById('conversionRate');
+      const currency = currencyInput.value.trim().toUpperCase();
+
+      if (!currency) return alert('Veuillez entrer une devise.');
+
+      fetch(`https://api.exchangerate.host/convert?from=${currency}&to=EUR`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.result) {
+            rateInput.value = data.result;
+          } else {
+            alert('Conversion non trouvée.');
+          }
+        })
+        .catch(error => {
+          console.error('Erreur de conversion :', error);
+          alert('Une erreur est survenue lors de la récupération du taux.');
+        });
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      
+      if (selectedCountries.length === 0) {
+        return alert('Veuillez ajouter au moins un pays.');
+      }
+
+      const newItem = {
+        type: document.getElementById('type').value,
+        countries: [...selectedCountries],
+        description: document.getElementById('description').value.trim(),
+        year: document.getElementById('year').value.trim(),
+        image: document.getElementById('image').value.trim(),
+        rarity: document.getElementById('rarity').value.trim(),
+        quantity: parseInt(document.getElementById('quantity').value) || 1,
+        faceValue: parseFloat(document.getElementById('faceValue').value) || 0,
+        currency: document.getElementById('currency').value.trim(),
+        conversionRate: parseFloat(document.getElementById('conversionRate').value) || 0,
+        validity: document.getElementById('validity').value
+      };
+      
+      if (editingIndex >= 0) {
+        // Modification d'un item existant
+        collection[editingIndex] = newItem;
+        editingIndex = -1;
+        editIndexInput.value = -1;
+        submitBtn.textContent = 'Ajouter';
+        cancelEditBtn.style.display = 'none';
+      } else {
+        // Ajout d'un nouvel item
+        collection.push(newItem);
+      }
+      saveAndRender();
+      form.reset();
+      selectedCountries = [];
+      renderCountryTags();
+    });
+
+    function saveAndRender() {
+      localStorage.setItem(storageKey, JSON.stringify(collection));
+      updateTotals();
+      updateMap();
+      
+      // Si on est dans la vue par pays, la rafraîchir
+      if (document.getElementById('pays').style.display === 'block') {
+        renderByCountry();
+      }
+    }
+
+    // Exposer les fonctions au scope global pour les boutons
+    window.removeCountry = removeCountry;
+
+    // Au chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Afficher seulement la section Accueil au début
+      document.getElementById('accueil').style.display = 'block';
+      document.querySelectorAll('section[id]').forEach(section => {
+        if (section.id !== 'accueil') section.style.display = 'none';
+      });
+      
+      // Initialiser la collection
+      saveAndRender();
+    });
+  </script>
+</body>
+</html>
