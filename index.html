@@ -1003,34 +1003,6 @@
       }
     }
 
-    // Exposer les fonctions au scope global pour les boutons
-    window.removeCountry = removeCountry;
-
-    // Au chargement de la page
-    document.addEventListener('DOMContentLoaded', function() {
-      // Vérifier si un utilisateur est connecté
-      currentUser = localStorage.getItem('coinCollectionCurrentUser');
-      if (currentUser) {
-        loadUserCollection(currentUser);
-      } else {
-        // Charger les données locales si aucun utilisateur n'est connecté
-        const localData = localStorage.getItem(storageKey);
-        if (localData) {
-          collection = JSON.parse(localData);
-        }
-      }
-      
-      updateAuthUI();
-      
-      // Afficher seulement la section Accueil au début
-      document.getElementById('accueil').style.display = 'block';
-      document.querySelectorAll('section[id]').forEach(section => {
-        if (section.id !== 'accueil') section.style.display = 'none';
-      });
-      
-      // Initialiser la collection
-      saveAndRender();
-    });
   </script>
 </body>
 </html>
