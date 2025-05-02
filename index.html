@@ -253,6 +253,14 @@
       max-width: 500px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
+    /* Styles pour l'authentification */
+    #authButtons {
+      margin-left: auto;
+    }
+    #authButtons .nav-item {
+      margin: 0 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -262,7 +270,7 @@
       <a href="#pays" class="nav-item" id="navPays">Pays</a>
       <a href="#carte" class="nav-item" id="navCarte">Carte du Monde</a>
       <a href="#totaux" class="nav-item" id="navTotaux">Totaux</a>
-      <div id="authButtons" style="margin-left: auto;">
+      <div id="authButtons">
         <button id="loginBtn" class="nav-item">Connexion</button>
         <button id="logoutBtn" class="nav-item" style="display:none;">Déconnexion</button>
       </div>
@@ -282,349 +290,7 @@
             <option value="billet">Billet</option>
           </select>
         </label>
-  <div id="authModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Connexion / Inscription</h2>
-      <div id="authTabs">
-        <button class="auth-tab active" onclick="openAuthTab('login')">Connexion</button>
-        <button class="auth-tab" onclick="openAuthTab('register')">Inscription</button>
-      </div>
-      
-      <div id="loginForm" class="auth-form">
-        <input type="text" id="loginUsername" placeholder="Nom d'utilisateur" required>
-        <input type="password" id="loginPassword" placeholder="Mot de passe" required>
-        <button onclick="loginUser()">Se connecter</button>
-        <p id="loginError" class="error-message"></p>
-      </div>
-      
-      <div id="registerForm" class="auth-form" style="display:none;">
-        <input type="text" id="registerUsername" placeholder="Nom d'utilisateur" required>
-        <input type="password" id="registerPassword" placeholder="Mot de passe" required>
-        <input type="password" id="registerConfirmPassword" placeholder="Confirmer le mot de passe" required>
-        <button onclick="registerUser()">S'inscrire</button>
-        <p id="registerError" class="error-message"></p>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    /* Ajout des styles pour l'authentification */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-    }
-    
-    .modal-content {
-      background-color: #fefefe;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 8px;
-      width: 300px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    
-    .close:hover {
-      color: black;
-    }
-    
-    .auth-tab {
-      padding: 10px 20px;
-      background: #e0f7fa;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .auth-tab.active {
-      background: #004d40;
-      color: white;
-    }
-    
-    .auth-form input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      box-sizing: border-box;
-    }
-    
-    .auth-form button {
-      width: 100%;
-      padding: 10px;
-      background-color: #004d40;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .error-message {
-      color: red;
-      font-size: 0.9em;
-    }
-    
-    #authButtons .nav-item {
-      margin: 0 5px;
-      cursor: pointer;
-    }
-  </style>
-         <script>
-    // Variables globales
-    const byCountryList = document.getElementById('byCountryList');
-    const totalValueDisplay = document.getElementById('totalValueDisplay');
-    const form = document.getElementById('moneyForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const cancelEditBtn = document.getElementById('cancelEdit');
-    const editIndexInput = document.getElementById('editIndex');
-    const countryInput = document.getElementById('countryInput');
-    const selectedCountriesContainer = document.getElementById('selectedCountries');
-    const searchInput = document.getElementById('searchCountry');
-    const toggleCompactBtn = document.getElementById('toggleCompactCountry');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const authModal = document.getElementById('authModal');
-    const closeModal = document.querySelector('.close');
-    
-    // Configuration GitHub
-    const GITHUB_USERNAME= 'picolaton'; // À remplacer
-    const GITHUB_REPO = 'Collection-monnaie'; // À remplacer
-    const GITHUB_TOKEN = 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'; // À remplacer (token avec accès repo)
-    
-    let collection = [];
-    let editingIndex = -1;
-    let selectedCountries = [];
-    let isCompactView = false;
-    let currentSearchTerm = '';
-    let currentUser = null;
-
-    // Gestion de l'authentification
-    loginBtn.addEventListener('click', () => {
-      authModal.style.display = 'block';
-    });
-    
-    logoutBtn.addEventListener('click', () => {
-      logoutUser();
-    });
-    
-    closeModal.addEventListener('click', () => {
-      authModal.style.display = 'none';
-    });
-    
-    window.addEventListener('click', (event) => {
-      if (event.target === authModal) {
-        authModal.style.display = 'none';
-      }
-    });
-    
-    function openAuthTab(tabName) {
-      document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('registerForm').style.display = 'none';
-      
-      if (tabName === 'login') {
-        document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
-        document.getElementById('loginForm').style.display = 'block';
-      } else {
-        document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
-        document.getElementById('registerForm').style.display = 'block';
-      }
-    }
-    
-    function loginUser() {
-      const username = document.getElementById('loginUsername').value;
-      const password = document.getElementById('loginPassword').value;
-      
-      // Vérification simple (en production, utiliser un vrai système d'authentification)
-      const users = JSON.parse(localStorage.getItem('coinCollectionUsers')) || {};
-      
-      if (users[username] && users[username].password === password) {
-        currentUser = username;
-        localStorage.setItem('coinCollectionCurrentUser', username);
-        loadUserCollection(username);
-        authModal.style.display = 'none';
-        updateAuthUI();
-      } else {
-        document.getElementById('loginError').textContent = 'Identifiants incorrects';
-      }
-    }
-    
-    function registerUser() {
-      const username = document.getElementById('registerUsername').value;
-      const password = document.getElementById('registerPassword').value;
-      const confirmPassword = document.getElementById('registerConfirmPassword').value;
-      
-      if (password !== confirmPassword) {
-        document.getElementById('registerError').textContent = 'Les mots de passe ne correspondent pas';
-        return;
-      }
-      
-      const users = JSON.parse(localStorage.getItem('coinCollectionUsers')) || {};
-      
-      if (users[username]) {
-        document.getElementById('registerError').textContent = 'Ce nom d\'utilisateur existe déjà';
-        return;
-      }
-      
-      users[username] = { password };
-      localStorage.setItem('coinCollectionUsers', JSON.stringify(users));
-      
-      // Créer une collection vide pour le nouvel utilisateur
-      localStorage.setItem(`coinCollection_${username}`, JSON.stringify([]));
-      
-      document.getElementById('registerError').textContent = '';
-      openAuthTab('login');
-      document.getElementById('loginUsername').value = username;
-      document.getElementById('loginPassword').value = password;
-    }
-    
-    function logoutUser() {
-      currentUser = null;
-      localStorage.removeItem('coinCollectionCurrentUser');
-      collection = [];
-      updateAuthUI();
-      saveAndRender();
-    }
-    
-    function updateAuthUI() {
-      if (currentUser) {
-        loginBtn.style.display = 'none';
-        logoutBtn.style.display = 'inline-block';
-      } else {
-        loginBtn.style.display = 'inline-block';
-        logoutBtn.style.display = 'none';
-      }
-    }
-    
-    function loadUserCollection(username) {
-      // D'abord essayer de charger depuis le localStorage
-      const localData = localStorage.getItem(`coinCollection_${username}`);
-      if (localData) {
-        collection = JSON.parse(localData);
-        saveAndRender();
-      }
-      
-      // Ensuite essayer de charger depuis GitHub
-      fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${username}.json`, {
-        headers: {
-          'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Aucune donnée trouvée sur GitHub');
-      })
-      .then(data => {
-        const content = atob(data.content);
-        collection = JSON.parse(content);
-        // Sauvegarder localement pour la prochaine fois
-        localStorage.setItem(`coinCollection_${username}`, content);
-        saveAndRender();
-      })
-      .catch(error => {
-        console.log('Chargement depuis GitHub échoué:', error.message);
-      });
-    }
-    
-    function saveToGitHub() {
-      if (!currentUser) return;
-      
-      const content = JSON.stringify(collection);
-      const contentBase64 = btoa(unescape(encodeURIComponent(content)));
-      const filename = `${currentUser}.json`;
-      const message = `Mise à jour de la collection pour ${currentUser}`;
-      
-      // D'abord vérifier si le fichier existe déjà pour obtenir son SHA
-      fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${filename}`, {
-        headers: {
-          'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      })
-      .then(response => response.ok ? response.json() : { sha: null })
-      .then(data => {
-        return fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${filename}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: message,
-            content: contentBase64,
-            sha: data.sha
-          })
-        });
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Échec de la sauvegarde sur GitHub');
-        console.log('Collection sauvegardée sur GitHub avec succès');
-      })
-      .catch(error => {
-        console.error('Erreur lors de la sauvegarde sur GitHub:', error);
-        // Sauvegarder localement en cas d'échec
-        localStorage.setItem(`coinCollection_${currentUser}`, content);
-      });
-    }
-
-    // Modifier la fonction saveAndRender pour inclure la sauvegarde sur GitHub
-    function saveAndRender() {
-      if (currentUser) {
-        localStorage.setItem(`coinCollection_${currentUser}`, JSON.stringify(collection));
-        saveToGitHub();
-      } else {
-        localStorage.setItem('coinCollectionLocal', JSON.stringify(collection));
-      }
-      
-      updateTotals();
-      updateMap();
-      
-      if (document.getElementById('pays').style.display === 'block') {
-        renderByCountry();
-      }
-    }
-
-    // Au chargement de la page
-    document.addEventListener('DOMContentLoaded', function() {
-      // Vérifier si un utilisateur est connecté
-      currentUser = localStorage.getItem('coinCollectionCurrentUser');
-      if (currentUser) {
-        loadUserCollection(currentUser);
-      } else {
-        // Charger les données locales si aucun utilisateur n'est connecté
-        const localData = localStorage.getItem('coinCollectionLocal');
-        if (localData) {
-          collection = JSON.parse(localData);
-        }
-      }
-      
-      updateAuthUI();
-      
-      // Afficher seulement la section Accueil au début
-      document.getElementById('accueil').style.display = 'block';
-      document.querySelectorAll('section[id]').forEach(section => {
-        if (section.id !== 'accueil') section.style.display = 'none';
-      });
-      
-      // Initialiser la collection
-      saveAndRender();
-    });
-
+        
         <label>Pays :
           <div id="selectedCountries"></div>
           <input type="text" id="countryInput" placeholder="Ajouter un pays...">
@@ -687,7 +353,34 @@
     </section>
   </div>
 
-  <!-- Ajout des bibliothèques D3.js -->
+  <!-- Modal d'authentification -->
+  <div id="authModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Connexion / Inscription</h2>
+      <div id="authTabs">
+        <button class="auth-tab active" onclick="openAuthTab('login')">Connexion</button>
+        <button class="auth-tab" onclick="openAuthTab('register')">Inscription</button>
+      </div>
+      
+      <div id="loginForm" class="auth-form">
+        <input type="text" id="loginUsername" placeholder="Nom d'utilisateur" required>
+        <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+        <button onclick="loginUser()">Se connecter</button>
+        <p id="loginError" class="error-message"></p>
+      </div>
+      
+      <div id="registerForm" class="auth-form" style="display:none;">
+        <input type="text" id="registerUsername" placeholder="Nom d'utilisateur" required>
+        <input type="password" id="registerPassword" placeholder="Mot de passe" required>
+        <input type="password" id="registerConfirmPassword" placeholder="Confirmer le mot de passe" required>
+        <button onclick="registerUser()">S'inscrire</button>
+        <p id="registerError" class="error-message"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bibliothèques JS -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://d3js.org/d3-geo.v3.min.js"></script>
 
@@ -703,16 +396,23 @@
     const selectedCountriesContainer = document.getElementById('selectedCountries');
     const searchInput = document.getElementById('searchCountry');
     const toggleCompactBtn = document.getElementById('toggleCompactCountry');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const authModal = document.getElementById('authModal');
+    const closeModal = document.querySelector('.close');
+    
     const storageKey = 'maCollectionMonnaie';
-
     let collection = JSON.parse(localStorage.getItem(storageKey)) || [];
     let editingIndex = -1;
     let selectedCountries = [];
     let isCompactView = false;
     let currentSearchTerm = '';
+    let currentUser = null;
 
     // Gestion de la navigation
     document.querySelectorAll('.nav-item').forEach(item => {
+      if (!item.id.includes('nav')) return;
+      
       item.addEventListener('click', function(e) {
         e.preventDefault();
         
@@ -1098,11 +798,131 @@
       }
     }
 
+    // Gestion de l'authentification
+    loginBtn.addEventListener('click', () => {
+      authModal.style.display = 'block';
+    });
+    
+    logoutBtn.addEventListener('click', () => {
+      logoutUser();
+    });
+    
+    closeModal.addEventListener('click', () => {
+      authModal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (event) => {
+      if (event.target === authModal) {
+        authModal.style.display = 'none';
+      }
+    });
+    
+    function openAuthTab(tabName) {
+      document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'none';
+      
+      if (tabName === 'login') {
+        document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+        document.getElementById('loginForm').style.display = 'block';
+      } else {
+        document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+        document.getElementById('registerForm').style.display = 'block';
+      }
+    }
+    
+    function loginUser() {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      // Vérification simple (en production, utiliser un vrai système d'authentification)
+      const users = JSON.parse(localStorage.getItem('coinCollectionUsers')) || {};
+      
+      if (users[username] && users[username].password === password) {
+        currentUser = username;
+        localStorage.setItem('coinCollectionCurrentUser', username);
+        loadUserCollection(username);
+        authModal.style.display = 'none';
+        updateAuthUI();
+      } else {
+        document.getElementById('loginError').textContent = 'Identifiants incorrects';
+      }
+    }
+    
+    function registerUser() {
+      const username = document.getElementById('registerUsername').value;
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('registerConfirmPassword').value;
+      
+      if (password !== confirmPassword) {
+        document.getElementById('registerError').textContent = 'Les mots de passe ne correspondent pas';
+        return;
+      }
+      
+      const users = JSON.parse(localStorage.getItem('coinCollectionUsers')) || {};
+      
+      if (users[username]) {
+        document.getElementById('registerError').textContent = 'Ce nom d\'utilisateur existe déjà';
+        return;
+      }
+      
+      users[username] = { password };
+      localStorage.setItem('coinCollectionUsers', JSON.stringify(users));
+      
+      // Créer une collection vide pour le nouvel utilisateur
+      localStorage.setItem(`coinCollection_${username}`, JSON.stringify([]));
+      
+      document.getElementById('registerError').textContent = '';
+      openAuthTab('login');
+      document.getElementById('loginUsername').value = username;
+      document.getElementById('loginPassword').value = password;
+    }
+    
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem('coinCollectionCurrentUser');
+      collection = [];
+      updateAuthUI();
+      saveAndRender();
+    }
+    
+    function updateAuthUI() {
+      if (currentUser) {
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'inline-block';
+      } else {
+        loginBtn.style.display = 'inline-block';
+        logoutBtn.style.display = 'none';
+      }
+    }
+    
+    function loadUserCollection(username) {
+      const localData = localStorage.getItem(`coinCollection_${username}`);
+      if (localData) {
+        collection = JSON.parse(localData);
+        saveAndRender();
+      }
+    }
+
     // Exposer les fonctions au scope global pour les boutons
     window.removeCountry = removeCountry;
 
     // Au chargement de la page
     document.addEventListener('DOMContentLoaded', function() {
+      // Vérifier si un utilisateur est connecté
+      currentUser = localStorage.getItem('coinCollectionCurrentUser');
+      if (currentUser) {
+        loadUserCollection(currentUser);
+      } else {
+        // Charger les données locales si aucun utilisateur n'est connecté
+        const localData = localStorage.getItem(storageKey);
+        if (localData) {
+          collection = JSON.parse(localData);
+        }
+      }
+      
+      updateAuthUI();
+      
       // Afficher seulement la section Accueil au début
       document.getElementById('accueil').style.display = 'block';
       document.querySelectorAll('section[id]').forEach(section => {
