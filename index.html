@@ -379,6 +379,78 @@
       </div>
     </div>
   </div>
+    <style>
+    /* Ajout des styles pour l'authentification */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover {
+      color: black;
+    }
+    
+    .auth-tab {
+      padding: 10px 20px;
+      background: #e0f7fa;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .auth-tab.active {
+      background: #004d40;
+      color: white;
+    }
+    
+    .auth-form input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+    
+    .auth-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #004d40;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .error-message {
+      color: red;
+      font-size: 0.9em;
+    }
+    
+    #authButtons .nav-item {
+      margin: 0 5px;
+      cursor: pointer;
+    }
+  </style>
 
   <!-- Bibliothèques JS -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -797,7 +869,34 @@
         renderByCountry();
       }
     }
-
+  <script>
+    // Variables globales
+    const byCountryList = document.getElementById('byCountryList');
+    const totalValueDisplay = document.getElementById('totalValueDisplay');
+    const form = document.getElementById('moneyForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelEditBtn = document.getElementById('cancelEdit');
+    const editIndexInput = document.getElementById('editIndex');
+    const countryInput = document.getElementById('countryInput');
+    const selectedCountriesContainer = document.getElementById('selectedCountries');
+    const searchInput = document.getElementById('searchCountry');
+    const toggleCompactBtn = document.getElementById('toggleCompactCountry');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const authModal = document.getElementById('authModal');
+    const closeModal = document.querySelector('.close');
+    
+    // Configuration GitHub
+    const GITHUB_USERNAME = 'Picolaton-vld'; // À remplacer
+    const GITHUB_REPO = 'Collection-monnaie'; // À remplacer
+    const GITHUB_TOKEN = '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'; // À remplacer (token avec accès repo)
+    
+    let collection = [];
+    let editingIndex = -1;
+    let selectedCountries = [];
+    let isCompactView = false;
+    let currentSearchTerm = '';
+    let currentUser = null;
     // Gestion de l'authentification
     loginBtn.addEventListener('click', () => {
       authModal.style.display = 'block';
