@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ma Collection de Monnaie</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arial" />
   <style>
     /* Barre de navigation */
     .navbar {
@@ -36,8 +37,7 @@
       background-color: #00796b;
       font-weight: bold;
     }
-    
-    body {
+      body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
@@ -261,6 +261,82 @@
       margin: 0 5px;
       cursor: pointer;
     }
+
+    /* Ajout des styles pour l'authentification */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: black;
+    }
+
+    .auth-tab {
+      padding: 10px 20px;
+      background: #e0f7fa;
+      border: none;
+      cursor: pointer;
+    }
+
+    .auth-tab.active {
+      background: #004d40;
+      color: white;
+    }
+
+    .auth-form input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+
+    .auth-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #004d40;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 0.9em;
+    }
+    
+    #authButtons .nav-item {
+      margin: 0 5px;
+      cursor: pointer;
+    }
+
+
+  <!-- Bibliothèques JS -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/d3-geo.v3.min.js"></script>
   </style>
 </head>
 <body>
@@ -379,82 +455,7 @@
       </div>
     </div>
   </div>
-    <style>
-    /* Ajout des styles pour l'authentification */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-    }
-    
-    .modal-content {
-      background-color: #fefefe;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 8px;
-      width: 300px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    
-    .close:hover {
-      color: black;
-    }
-    
-    .auth-tab {
-      padding: 10px 20px;
-      background: #e0f7fa;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .auth-tab.active {
-      background: #004d40;
-      color: white;
-    }
-    
-    .auth-form input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      box-sizing: border-box;
-    }
-    
-    .auth-form button {
-      width: 100%;
-      padding: 10px;
-      background-color: #004d40;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .error-message {
-      color: red;
-      font-size: 0.9em;
-    }
-    
-    #authButtons .nav-item {
-      margin: 0 5px;
-      cursor: pointer;
-    }
-  </style>
-
-  <!-- Bibliothèques JS -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://d3js.org/d3-geo.v3.min.js"></script>
+  
 
   <script>
     // Variables globales
@@ -1002,7 +1003,31 @@
         saveAndRender();
       }
     }
+<div id="authModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Connexion / Inscription</h2>
+    <div id="authTabs">
+      <button class="auth-tab active" onclick="openAuthTab('login')">Connexion</button>
+      <button class="auth-tab" onclick="openAuthTab('register')">Inscription</button>
+    </div>
 
+    <div id="loginForm" class="auth-form">
+      <input type="text" id="loginUsername" placeholder="Nom d'utilisateur" required>
+      <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+      <button onclick="loginUser()">Se connecter</button>
+      <p id="loginError" class="error-message"></p>
+    </div>
+
+    <div id="registerForm" class="auth-form" style="display:none;">
+      <input type="text" id="registerUsername" placeholder="Nom d'utilisateur" required>
+      <input type="password" id="registerPassword" placeholder="Mot de passe" required>
+      <input type="password" id="registerConfirmPassword" placeholder="Confirmer le mot de passe" required>
+      <button onclick="registerUser()">S'inscrire</button>
+      <p id="registerError" class="error-message"></p>
+    </div>
+  </div>
+</div>
   </script>
 </body>
 </html>
